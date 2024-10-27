@@ -1,5 +1,6 @@
 import { Button, Image, Input, Textarea } from "@nextui-org/react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { useProductMutation } from "..";
 
 interface FormInputs {
   title: string;
@@ -10,18 +11,24 @@ interface FormInputs {
 }
 
 export function NewProduct() {
-  const { control, handleSubmit } = useForm<FormInputs>({
+  const productMutation = useProductMutation();
+
+  const { control, handleSubmit, watch } = useForm<FormInputs>({
     defaultValues: {
-      title: "",
-      price: 0,
-      image: "",
-      description: "",
+      title: "Teclado",
+      price: 123456,
+      image:
+        "https://assets-prd.ignimgs.com/2022/08/08/key-height-1659999343695.JPG",
+      description:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti in delectus expedita at et, dolor aperiam tenetur veniam, autem quae cumque alias tempore vero cum necessitatibus qui quidem iure doloremque.",
       category: "men's clothing",
     },
   });
 
+  const newImage = watch("image");
+
   const onSubmit: SubmitHandler<FormInputs> = (data) => {
-    console.log(data);
+    productMutation.mutate(data);
   };
 
   return (
@@ -53,7 +60,7 @@ export function NewProduct() {
               render={({ field }) => (
                 <Input
                   value={field.value?.toString()}
-                  onChange={ev => field.onChange(+ev)}
+                  onChange={(ev) => field.onChange(+ev)}
                   className="mt-2"
                   type="number"
                   label="Precio del producto"
@@ -109,8 +116,13 @@ export function NewProduct() {
             />
 
             <br />
-            <Button type="submit" className="mt-2" color="primary">
-              Crear
+            <Button
+              type="submit"
+              className="mt-2"
+              color="primary"
+              isDisabled={productMutation.isPending}
+            >
+              {productMutation.isPending ? "Cargando..." : "Crear producto"}
             </Button>
           </div>
 
@@ -121,7 +133,7 @@ export function NewProduct() {
               height: "600px",
             }}
           >
-            <Image src="https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg" />
+            <Image src={newImage} />
           </div>
         </div>
       </form>

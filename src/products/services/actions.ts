@@ -1,11 +1,11 @@
-import type { Product } from "..";
+import type { Product, ProductLike } from "..";
 
 interface GetProdcutsOptions {
   filterKey?: string;
   id?: number;
 }
 
-function sleep(seconds: number): Promise<Boolean> {
+export function sleep(seconds: number): Promise<Boolean> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true);
@@ -16,7 +16,7 @@ function sleep(seconds: number): Promise<Boolean> {
 export async function getProducts({
   filterKey,
 }: GetProdcutsOptions): Promise<Product[]> {
-  await sleep(2);
+  // await sleep(2);
 
   const filterUrl = filterKey ? `?category=${filterKey}` : "";
 
@@ -30,11 +30,25 @@ export async function getProducts({
 export async function getProductById({
   id,
 }: GetProdcutsOptions): Promise<Product> {
-  await sleep(2);
+  // await sleep(2);
 
   const data = await fetch(`http://localhost:3100/products/${id}`).then(
     (r): Promise<Product> => r.json(),
   );
+
+  return data;
+}
+
+export async function createProduct(product: ProductLike): Promise<Product> {
+  // await sleep(2);
+
+  const data = await fetch("http://localhost:3100/products", {
+    method: "POST",
+    body: JSON.stringify(product),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((r): Promise<Product> => r.json());
 
   return data;
 }
